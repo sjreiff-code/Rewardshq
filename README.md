@@ -1,2 +1,0 @@
-# Rewardshq
-Rewards tracker 
