@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#060d1a">
+<title>Rewards Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #060d1a;
+    --bg2:     #0d1b2e;
+    --bg3:     #112240;
+    --card:    #0f1e35;
+    --border:  #1e3a5f;
+    --maroon:  #38bdf8;
+    --maroon2: #7dd3fc;
+    --maroon3: #38bdf8;
+    --gold:    #f59e0b;
+    --gold2:   #fbbf24;
+    --green:   #34d399;
+    --amber:   #f59e0b;
+    --muted:   #64748b;
+    --text:    #e2e8f0;
+    --dim:     #94a3b8;
+    --navy:    #060d1a;
+    --navy2:   #0d1b2e;
+    --navy3:   #112240;
+    --sky:     #38bdf8;
+    --sky2:    #7dd3fc;
+    --purple:  #a78bfa;
+    --rose:    #fb7185;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+background: #060d1a;
+color: #e2e8f0;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 15px;
+min-height: 100vh;
+padding-bottom: 40px;
+}
+
+/* ── HEADER ── */
+.header {
+background: rgba(13,27,46,0.92);
+backdrop-filter: blur(16px);
+-webkit-backdrop-filter: blur(16px);
+box-shadow: 0 4px 20px rgba(0,0,0,.3);
+padding: 12px 16px 0;
+position: fixed;
+top: 12px;
+left: 12px;
+right: 12px;
+z-index: 100;
+border-radius: 18px;
+transition: transform .3s ease, opacity .3s ease;
+}
+
+.header.hidden {
+transform: translateY(-110%);
+opacity: 0;
+}
+
+body { padding-top: 110px; }
+
+.header-top {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 2px;
+}
+
+.logo {
+font-family: ‘Syne’, sans-serif;
+font-weight: 800;
+font-size: 17px;
+letter-spacing: -0.5px;
+color: #38bdf8;
+}
+
+.logo span { color: #e2e8f0; }
+
+.total-pill {
+background: linear-gradient(135deg, #f59e0b, #d97706);
+color: #000;
+font-family: ‘Syne’, sans-serif;
+font-weight: 700;
+font-size: 13px;
+padding: 4px 10px;
+border-radius: 20px;
+letter-spacing: 0.2px;
+}
+
+.tabs {
+display: flex;
+gap: 2px;
+margin: 8px 0 0;
+overflow-x: auto;
+scrollbar-width: none;
+padding-bottom: 0;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+flex-shrink: 0;
+padding: 6px 12px;
+border-radius: 8px 8px 0 0;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 12px;
+font-weight: 500;
+cursor: pointer;
+border: none;
+border-bottom: 2px solid transparent;
+background: transparent;
+color: #64748b;
+transition: all .2s;
+}
+.tab.active {
+color: #38bdf8;
+border-bottom-color: #38bdf8;
+background: rgba(56,189,248,.07);
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+display: flex;
+gap: 8px;
+padding: 12px 16px;
+overflow-x: auto;
+scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+
+.filter-pill {
+flex-shrink: 0;
+padding: 6px 14px;
+border-radius: 20px;
+border: 2px solid #3d5a80;
+background-color: #0f1e35;
+color: #e2e8f0 !important;
+font-size: 13px;
+font-family: ‘DM Sans’, sans-serif;
+font-weight: 500;
+cursor: pointer;
+transition: all .2s;
+}
+.filter-pill.active {
+background-color: #38bdf8 !important;
+border-color: #38bdf8 !important;
+color: #000000 !important;
+font-weight: 700 !important;
+}
+
+/* ── SEARCH ── */
+.search-wrap {
+padding: 0 16px 12px;
+}
+.search-input {
+width: 100%;
+background: #0f1e35;
+border: 1px solid #1e3a5f;
+border-radius: 10px;
+padding: 10px 14px 10px 38px;
+color: #e2e8f0;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+outline: none;
+transition: border-color .2s;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘16’ height=‘16’ viewBox=‘0 0 24 24’ fill=‘none’ stroke=’%2364748b’ stroke-width=‘2’%3E%3Ccircle cx=‘11’ cy=‘11’ r=‘8’/%3E%3Cpath d=‘m21 21-4.35-4.35’/%3E%3C/svg%3E”);
+background-repeat: no-repeat;
+background-position: 12px center;
+}
+.search-input:focus { border-color: #38bdf8; }
+.search-input::placeholder { color: #64748b; }
+
+/* ── CONTENT ── */
+.content { padding: 0 12px; }
+
+/* ── SECTION ── */
+.section { margin-bottom: 10px; border-radius: 14px; overflow: hidden; border: 1px solid #1e3a5f; }
+
+.section-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 13px 16px;
+cursor: pointer;
+user-select: none;
+background: #0f1e35;
+transition: background .15s;
+}
+.section-header:active { background: #112240; }
+
+.section-left { display: flex; align-items: center; gap: 10px; }
+
+.section-dot {
+width: 8px; height: 8px;
+border-radius: 50%;
+flex-shrink: 0;
+}
+
+.section-title {
+font-family: ‘Syne’, sans-serif;
+font-weight: 700;
+font-size: 14px;
+letter-spacing: 0.3px;
+}
+
+.section-right { display: flex; align-items: center; gap: 10px; }
+
+.section-total {
+font-family: ‘Syne’, sans-serif;
+font-weight: 600;
+font-size: 14px;
+color: #7dd3fc;
+}
+
+.chevron {
+color: #64748b;
+transition: transform .25s;
+font-size: 12px;
+line-height: 1;
+}
+.section.open .chevron { transform: rotate(180deg); }
+
+/* ── ROWS ── */
+.section-body { display: none; }
+.section.open .section-body { display: block; }
+
+.row {
+display: flex;
+align-items: center;
+padding: 11px 16px;
+border-top: 1px solid rgba(30,58,95,.5);
+background: #0d1b2e;
+gap: 10px;
+transition: background .1s;
+}
+.row:active { background: #112240; }
+.row.hidden { display: none; }
+
+.row-info { flex: 1; min-width: 0; }
+
+.row-name {
+font-weight: 500;
+font-size: 14px;
+color: #e2e8f0;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.row-sub {
+font-size: 12px;
+color: #64748b;
+margin-top: 2px;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.row-right { text-align: right; flex-shrink: 0; }
+
+.row-value {
+font-family: ‘Syne’, sans-serif;
+font-weight: 600;
+font-size: 14px;
+color: #34d399;
+}
+.row-value.tbd { color: #64748b; font-weight: 400; font-size: 13px; }
+
+.row-pts {
+font-size: 11px;
+color: #64748b;
+margin-top: 2px;
+}
+
+.owner-badge {
+font-size: 10px;
+font-weight: 600;
+padding: 2px 7px;
+border-radius: 10px;
+flex-shrink: 0;
+letter-spacing: 0.3px;
+text-transform: uppercase;
+}
+.badge-sheldon { background: rgba(56,189,248,.15); color: #38bdf8; }
+.badge-janae   { background: rgba(167,139,250,.15); color: #a78bfa; }
+.badge-joint   { background: rgba(52,211,153,.12); color: #34d399; }
+
+/* ── CREDITS SHEET ── */
+.credit-row {
+display: flex;
+flex-direction: column;
+padding: 12px 16px;
+border-top: 1px solid rgba(30,58,95,.5);
+background: #0d1b2e;
+gap: 4px;
+}
+.credit-row:active { background: #112240; }
+.credit-row.hidden { display: none; }
+
+.credit-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.credit-name { font-weight: 500; font-size: 14px; color: #e2e8f0; flex: 1; }
+.credit-value { font-family: ‘Syne’, sans-serif; font-weight: 700; font-size: 15px; color: #f59e0b; flex-shrink: 0; }
+.credit-value.tbd { color: #64748b; font-weight: 400; font-size: 13px; }
+.credit-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.credit-deadline { font-size: 12px; color: #fb7185; font-weight: 500; }
+.credit-deadline.normal { color: #64748b; font-weight: 400; }
+.credit-notes { font-size: 12px; color: #64748b; }
+
+/* ── SUMMARY CARDS ── */
+.summary-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+padding: 0 12px 16px;
+}
+
+.sum-card {
+background: #0f1e35;
+border: 1px solid #1e3a5f;
+border-radius: 14px;
+padding: 14px;
+}
+.sum-card.wide { grid-column: 1 / -1; }
+
+.sum-label {
+font-size: 11px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.8px;
+color: #64748b;
+margin-bottom: 6px;
+}
+.sum-value {
+font-family: ‘Syne’, sans-serif;
+font-weight: 800;
+font-size: 22px;
+color: #e2e8f0;
+}
+.sum-sub { font-size: 12px; color: #64748b; margin-top: 3px; }
+
+/* ── TAB PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── EMPTY STATE ── */
+.empty {
+text-align: center;
+padding: 40px 20px;
+color: #64748b;
+font-size: 14px;
+}
+
+/* ── EDIT MODE ── */
+.row-wrap { position: relative; }
+.edit-mode-btn {
+position: fixed;
+bottom: 24px;
+right: 20px;
+z-index: 200;
+background: #38bdf8;
+color: #000;
+border: none;
+border-radius: 50px;
+padding: 13px 22px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 15px;
+font-weight: 700;
+cursor: pointer;
+box-shadow: 0 4px 20px rgba(56,189,248,.4);
+display: flex;
+align-items: center;
+gap: 8px;
+transition: background .2s, transform .1s;
+}
+.edit-mode-btn:active { transform: scale(.96); }
+.edit-mode-btn.active {
+background: #34d399;
+box-shadow: 0 4px 20px rgba(52,211,153,.4);
+}
+body.edit-mode .row { cursor: pointer; }
+body.edit-mode .row:hover,
+body.edit-mode .row:active { background: #1e3a5f; }
+.edit-hint {
+display: none;
+position: fixed;
+bottom: 80px;
+right: 20px;
+z-index: 200;
+background: #0f1e35;
+border: 1px solid #1e3a5f;
+color: #94a3b8;
+font-size: 12px;
+padding: 6px 12px;
+border-radius: 10px;
+white-space: nowrap;
+}
+body.edit-mode .edit-hint { display: block; }
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,.45);
+z-index: 500;
+align-items: flex-end;
+justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+background: #0d1b2e;
+border-radius: 20px 20px 0 0;
+padding: 24px 20px 40px;
+width: 100%;
+max-width: 480px;
+animation: slideUp .25s ease;
+}
+@keyframes slideUp {
+from { transform: translateY(100%); }
+to   { transform: translateY(0); }
+}
+
+.modal-handle {
+width: 40px; height: 4px;
+background: #1e3a5f;
+border-radius: 2px;
+margin: 0 auto 20px;
+}
+
+.modal-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 18px;
+font-weight: 700;
+color: #e2e8f0;
+margin-bottom: 4px;
+}
+
+.modal-owner {
+font-size: 13px;
+color: #64748b;
+margin-bottom: 20px;
+}
+
+.modal-label {
+font-size: 12px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.7px;
+color: #64748b;
+margin-bottom: 8px;
+}
+
+.modal-input {
+width: 100%;
+background: #060d1a;
+border: 2px solid #1e3a5f;
+border-radius: 12px;
+padding: 14px 16px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 22px;
+font-weight: 600;
+color: #e2e8f0;
+outline: none;
+transition: border-color .2s;
+margin-bottom: 8px;
+}
+.modal-input:focus { border-color: #38bdf8; }
+
+.modal-hint { font-size: 12px; color: #64748b; margin-bottom: 24px; }
+
+.modal-btns { display: flex; gap: 10px; }
+
+.modal-cancel {
+flex: 1;
+padding: 14px;
+border-radius: 12px;
+border: 1px solid #1e3a5f;
+background: #112240;
+color: #94a3b8;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 15px;
+font-weight: 500;
+cursor: pointer;
+}
+
+.modal-save {
+flex: 2;
+padding: 14px;
+border-radius: 12px;
+border: none;
+background: #38bdf8;
+color: #000;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 15px;
+font-weight: 600;
+cursor: pointer;
+transition: background .2s;
+}
+.modal-save:active { background: #7dd3fc; }
+
+/* ── MONTHLY CREDITS ── */
+.month-bar {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 12px 16px 4px;
+}
+.month-label {
+font-family: ‘Syne’, sans-serif;
+font-size: 16px;
+font-weight: 700;
+color: #e2e8f0;
+}
+.month-reset {
+font-size: 12px;
+color: #38bdf8;
+font-weight: 600;
+cursor: pointer;
+background: none;
+border: none;
+padding: 4px 8px;
+border-radius: 8px;
+}
+.month-progress-wrap {
+padding: 0 16px 12px;
+}
+.month-progress-bar {
+height: 5px;
+background: #1e3a5f;
+border-radius: 3px;
+overflow: hidden;
+margin-bottom: 4px;
+}
+.month-progress-fill {
+height: 100%;
+background: #38bdf8;
+border-radius: 3px;
+transition: width .4s ease;
+}
+.month-progress-text {
+font-size: 11px;
+color: #64748b;
+text-align: right;
+}
+
+.credit-item {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 12px 16px;
+border-top: 1px solid rgba(30,58,95,.5);
+background: #0d1b2e;
+cursor: pointer;
+transition: background .1s;
+}
+.credit-item:first-child { border-top: none; }
+.credit-item:active { background: #112240; }
+.credit-item.checked { background: rgba(52,211,153,.05); }
+
+.credit-checkbox {
+width: 22px;
+height: 22px;
+border-radius: 50%;
+border: 2px solid #1e3a5f;
+flex-shrink: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all .2s;
+background: transparent;
+}
+.credit-item.checked .credit-checkbox {
+background: #34d399;
+border-color: #34d399;
+}
+.credit-checkbox-tick {
+color: #000;
+font-size: 12px;
+opacity: 0;
+transition: opacity .15s;
+}
+.credit-item.checked .credit-checkbox-tick { opacity: 1; }
+
+.credit-item-info { flex: 1; min-width: 0; }
+.credit-item-name {
+font-size: 14px;
+font-weight: 500;
+color: #e2e8f0;
+line-height: 1.3;
+}
+.credit-item.checked .credit-item-name {
+color: #64748b;
+text-decoration: line-through;
+text-decoration-color: #64748b;
+}
+.credit-item-meta {
+font-size: 11px;
+color: #64748b;
+margin-top: 2px;
+display: flex;
+gap: 6px;
+flex-wrap: wrap;
+align-items: center;
+}
+.credit-item-amount {
+font-family: ‘Syne’, sans-serif;
+font-weight: 700;
+font-size: 14px;
+color: #34d399;
+flex-shrink: 0;
+}
+.credit-item.checked .credit-item-amount { color: #64748b; }
+
+.credit-period-badge {
+font-size: 10px;
+font-weight: 600;
+padding: 1px 6px;
+border-radius: 8px;
+background: rgba(245,158,11,.15);
+color: #f59e0b;
+text-transform: uppercase;
+letter-spacing: 0.3px;
+}
+
+.mc-section { margin-bottom: 10px; border-radius: 14px; overflow: hidden; border: 1px solid #1e3a5f; }
+.mc-section-header {
+display: flex; align-items: center; justify-content: space-between;
+padding: 11px 16px; background: #0f1e35; cursor: pointer; user-select: none;
+}
+.mc-section-header:active { background: #112240; }
+.mc-section-left { display: flex; align-items: center; gap: 10px; }
+.mc-section-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.mc-section-title { font-weight: 600; font-size: 14px; color: #e2e8f0; font-family: ‘Syne’, sans-serif; }
+.mc-section-right { display: flex; align-items: center; gap: 8px; }
+.mc-section-val { font-weight: 600; font-size: 13px; color: #7dd3fc; }
+.mc-section-body { display: none; }
+.mc-section.open .mc-section-body { display: block; }
+.mc-section .chevron { color: #64748b; transition: transform .25s; font-size: 11px; }
+.mc-section.open .chevron { transform: rotate(180deg); }
+
+/* ── PIN LOCK SCREEN ── */
+.pin-screen {
+position: fixed;
+inset: 0;
+background: #060d1a;
+z-index: 9999;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 40px 24px;
+}
+.pin-screen.hidden { display: none; }
+
+.pin-logo {
+font-family: ‘Syne’, sans-serif;
+font-size: 28px;
+font-weight: 800;
+color: #38bdf8;
+margin-bottom: 6px;
+}
+.pin-logo span { color: #38bdf8; }
+
+.pin-tagline {
+font-size: 13px;
+color: #64748b;
+margin-bottom: 48px;
+}
+
+.pin-dots {
+display: flex;
+gap: 16px;
+margin-bottom: 40px;
+}
+
+.pin-dot {
+width: 14px;
+height: 14px;
+border-radius: 50%;
+border: 2px solid #1e3a5f;
+background: #0d1b2e;
+transition: all .2s;
+}
+.pin-dot.filled { background: #38bdf8; border-color: #38bdf8; transform: scale(1.1); }
+.pin-dot.error  { background: #e53e3e; border-color: #e53e3e; animation: shake .3s ease; }
+
+@keyframes shake {
+0%,100% { transform: translateX(0); }
+25% { transform: translateX(-6px); }
+75% { transform: translateX(6px); }
+}
+
+.pin-keypad {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 12px;
+width: 100%;
+max-width: 280px;
+}
+
+.pin-key {
+background: #0f1e35;
+border: 1px solid #1e3a5f;
+border-radius: 16px;
+padding: 18px 0;
+font-family: ‘Syne’, sans-serif;
+font-size: 22px;
+font-weight: 600;
+color: #e2e8f0;
+cursor: pointer;
+box-shadow: 0 2px 8px rgba(0,0,0,.2);
+transition: background .1s, transform .1s;
+text-align: center;
+}
+.pin-key:active { background: #112240; transform: scale(.94); }
+.pin-key.empty  { background: transparent; border: none; box-shadow: none; cursor: default; }
+.pin-key.delete { font-size: 18px; color: #64748b; }
+
+.pin-error-msg {
+margin-top: 20px;
+font-size: 13px;
+color: #fc8181;
+font-weight: 500;
+height: 20px;
+}
+
+.alert-banner {
+margin: 0 12px 12px;
+background: rgba(251,113,133,.1);
+border: 1px solid rgba(251,113,133,.25);
+border-radius: 12px;
+padding: 12px 14px;
+display: flex;
+gap: 10px;
+align-items: flex-start;
+}
+.alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert-text { font-size: 13px; color: #fb7185; line-height: 1.5; }
+.alert-text strong { display: block; font-weight: 600; margin-bottom: 2px; }
+</style>
+
+</head>
+<body>
+<style>
+  html, body { background: #060d1a !important; }
+  .row, .section-header, .credit-row, .mc-section-header, .sum-card, .modal, .filter-pill { background: #0d1b2e !important; }
+  .section, .mc-section { background: #0f1e35 !important; }
+</style>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">Rewards<span>HQ</span></div>
+    <div class="total-pill" id="grandTotal">$42,260</div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('rewards', this)">Points & Miles</button>
+    <button class="tab" onclick="switchTab('credits', this)">Credits & Bonuses</button>
+    <button class="tab" onclick="switchTab('monthly', this)">Monthly Credits</button>
+    <button class="tab" onclick="switchTab('summary', this)">Summary</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+
+<!-- PAGE 1: REWARDS                                 -->
+
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="page active" id="page-rewards">
+
+  <div class="filter-bar">
+    <button class="filter-pill active" style="background-color:#38bdf8;color:#000;border-color:#38bdf8;font-weight:700;" onclick="filterRows('all', this)">All</button>
+    <button class="filter-pill" onclick="filterRows('Sheldon', this)">Sheldon</button>
+    <button class="filter-pill" onclick="filterRows('Janae', this)">Janae</button>
+    <button class="filter-pill" onclick="filterRows('Joint', this)">Joint</button>
+  </div>
+
+  <div class="search-wrap">
+    <input class="search-input" type="text" placeholder="Search accounts…" oninput="searchRows(this.value, 'rewards')">
+  </div>
+
+  <div class="content" id="rewards-content">
+
+```
+<!-- AIRLINE MILES -->
+<div class="section open" data-section="airline">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#38bdf8"></div>
+      <div class="section-title">Airline Miles</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" id="tot-airline">$0</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="row" data-owner="Joint" data-val="7185" data-cpp="1.5" data-pts="479000"><div class="row-info"><div class="row-name">Alaska Miles</div><div class="row-sub">479,000 pts · 1.5¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$7,185</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="3626" data-cpp="1.4" data-pts="259000"><div class="row-info"><div class="row-name">AA Miles</div><div class="row-sub">259,000 pts · 1.4¢</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$3,626</div></div></div>
+    <div class="row" data-owner="Janae" data-val="3556" data-cpp="1.4" data-pts="254000"><div class="row-info"><div class="row-name">AA Miles</div><div class="row-sub">254,000 pts · 1.4¢</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$3,556</div></div></div>
+    <div class="row" data-owner="Janae" data-val="1458" data-cpp="1.3" data-pts="112000"><div class="row-info"><div class="row-name">Delta Business Amex</div><div class="row-sub">112,000 pts · 1.3¢</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$1,458</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="1326" data-cpp="1.3" data-pts="102000"><div class="row-info"><div class="row-name">Delta Business Amex</div><div class="row-sub">102,000 pts · 1.3¢</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$1,326</div></div></div>
+    <div class="row" data-owner="Joint" data-val="2844" data-cpp="1.3" data-pts="216000"><div class="row-info"><div class="row-name">United Miles</div><div class="row-sub">216,000 pts · 1.3¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$2,844</div></div></div>
+    <div class="row" data-owner="Joint" data-val="1191" data-cpp="1.4" data-pts="85100"><div class="row-info"><div class="row-name">Virgin Atlantic Points</div><div class="row-sub">85,100 pts · 1.4¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$1,191</div></div></div>
+    <div class="row" data-owner="Joint" data-val="1020" data-cpp="1.0" data-pts="102000"><div class="row-info"><div class="row-name">Frontier Miles</div><div class="row-sub">102,000 pts · 1.0¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$1,020</div></div></div>
+    <div class="row" data-owner="Joint" data-val="995" data-cpp="1.3" data-pts="76600"><div class="row-info"><div class="row-name">JetBlue Miles</div><div class="row-sub">76,600 pts · 1.3¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$995</div></div></div>
+    <div class="row" data-owner="Joint" data-val="962" data-cpp="1.3" data-pts="74000"><div class="row-info"><div class="row-name">Southwest Chase</div><div class="row-sub">74,000 pts · 1.3¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$962</div></div></div>
+    <div class="row" data-owner="Joint" data-val="30" data-cpp="1.5" data-pts="2000"><div class="row-info"><div class="row-name">Rove Miles</div><div class="row-sub">2,000 pts · 1.5¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$30</div></div></div>
+  </div>
+</div>
+
+<!-- TRANSFERABLE POINTS -->
+<div class="section open" data-section="transfer">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#a78bfa"></div>
+      <div class="section-title">Transferable Points</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" id="tot-transfer">$0</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="row" data-owner="Sheldon" data-val="1860" data-cpp="1.5" data-pts="124000"><div class="row-info"><div class="row-name">Amex MR</div><div class="row-sub">124,000 pts · 1.5¢</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$1,860</div></div></div>
+    <div class="row" data-owner="Janae" data-val="1470" data-cpp="1.5" data-pts="98000"><div class="row-info"><div class="row-name">Amex MR</div><div class="row-sub">98,000 pts · 1.5¢</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$1,470</div></div></div>
+    <div class="row" data-owner="Janae" data-val="3015" data-cpp="1.5" data-pts="201000"><div class="row-info"><div class="row-name">Chase UR (Sapphire)</div><div class="row-sub">201,000 pts · 1.5¢</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$3,015</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="1125" data-cpp="1.5" data-pts="75000"><div class="row-info"><div class="row-name">Chase UR (Sapphire)</div><div class="row-sub">75,000 pts · 1.5¢</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$1,125</div></div></div>
+    <div class="row" data-owner="Janae" data-val="1382" data-cpp="1.5" data-pts="92100"><div class="row-info"><div class="row-name">Capital One Venture</div><div class="row-sub">92,100 pts · 1.5¢</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$1,382</div></div></div>
+    <div class="row" data-owner="Joint" data-val="145" data-cpp="1.5" data-pts="9500"><div class="row-info"><div class="row-name">Capital One Venture X</div><div class="row-sub">9,500 pts · 1.5¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$145</div></div></div>
+    <div class="row" data-owner="Janae" data-val="930" data-cpp="1.5" data-pts="62000"><div class="row-info"><div class="row-name">Citi Strata Premier</div><div class="row-sub">62,000 pts · 1.5¢</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$930</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="340" data-cpp="1.5" data-pts="22667"><div class="row-info"><div class="row-name">Citi Thank You</div><div class="row-sub">22,667 pts · 1.5¢</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$340</div></div></div>
+    <div class="row" data-owner="Janae" data-val="92" data-cpp="1.5" data-pts="6133"><div class="row-info"><div class="row-name">Citi Thank You</div><div class="row-sub">6,133 pts · 1.5¢</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$92</div></div></div>
+  </div>
+</div>
+
+<!-- HOTEL POINTS -->
+<div class="section open" data-section="hotel">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#fb7185"></div>
+      <div class="section-title">Hotel Points</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" id="tot-hotel">$0</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="row" data-owner="Joint" data-val="4554" data-cpp="1.8" data-pts="253314"><div class="row-info"><div class="row-name">Hyatt Points</div><div class="row-sub">253,314 pts · 1.8¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$4,554</div></div></div>
+    <div class="row" data-owner="Joint" data-val="347" data-cpp="0.76" data-pts="47112"><div class="row-info"><div class="row-name">Marriott Bonvoy</div><div class="row-sub">47,112 pts · 0.76¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$347</div></div></div>
+    <div class="row" data-owner="Joint" data-val="320" data-cpp="0.41" data-pts="78200"><div class="row-info"><div class="row-name">Hilton Honors</div><div class="row-sub">78,200 pts · 0.41¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$320</div></div></div>
+    <div class="row" data-owner="Joint" data-val="189" data-cpp="0.61" data-pts="31000"><div class="row-info"><div class="row-name">Best Western</div><div class="row-sub">31,000 pts · 0.61¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$189</div></div></div>
+    <div class="row" data-owner="Joint" data-val="16" data-cpp="0.8" data-pts="2000"><div class="row-info"><div class="row-name">Wyndham Points</div><div class="row-sub">2,000 pts · 0.8¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$16</div></div></div>
+    <div class="row" data-owner="Joint" data-val="14" data-cpp="0.8" data-pts="1780"><div class="row-info"><div class="row-name">Choice Privileges</div><div class="row-sub">1,780 pts · 0.8¢</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$14</div></div></div>
+  </div>
+</div>
+
+<!-- CASH BACK / BANK -->
+<div class="section" data-section="cash">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#34d399"></div>
+      <div class="section-title">Cash Back / Bank</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" id="tot-cash">$0</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="row" data-owner="Joint" data-val="661"><div class="row-info"><div class="row-name">One Key Cash</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$661</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="265"><div class="row-info"><div class="row-name">BofA Travel Card</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$265</div></div></div>
+    <div class="row" data-owner="Joint" data-val="88"><div class="row-info"><div class="row-name">Gondola</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$88</div></div></div>
+    <div class="row" data-owner="Joint" data-val="60"><div class="row-info"><div class="row-name">Robinhood Card</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$60</div></div></div>
+    <div class="row" data-owner="Janae" data-val="52"><div class="row-info"><div class="row-name">Shop Your Way</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$52</div></div></div>
+    <div class="row" data-owner="Joint" data-val="32"><div class="row-info"><div class="row-name">Tollway ILL</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$32</div></div></div>
+    <div class="row" data-owner="Joint" data-val="25"><div class="row-info"><div class="row-name">Epass</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$25</div></div></div>
+    <div class="row" data-owner="Janae" data-val="25"><div class="row-info"><div class="row-name">Capital One Shopping</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$25</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="22"><div class="row-info"><div class="row-name">Capital One Shopping</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$22</div></div></div>
+    <div class="row" data-owner="Joint" data-val="23"><div class="row-info"><div class="row-name">US Bank Altitude Connect</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$23</div></div></div>
+    <div class="row" data-owner="Joint" data-val="13"><div class="row-info"><div class="row-name">US Bank Business</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$13</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="28"><div class="row-info"><div class="row-name">Discover Miles</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$28</div></div></div>
+    <div class="row" data-owner="Janae" data-val="17"><div class="row-info"><div class="row-name">Discover Miles</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$17</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="21"><div class="row-info"><div class="row-name">Discover</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$21</div></div></div>
+    <div class="row" data-owner="Janae" data-val="1"><div class="row-info"><div class="row-name">Discover</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$1</div></div></div>
+    <div class="row" data-owner="Joint" data-val="16"><div class="row-info"><div class="row-name">7-Eleven</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$16</div></div></div>
+  </div>
+</div>
+
+<!-- FUEL / AUTO -->
+<div class="section" data-section="fuel">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#f59e0b"></div>
+      <div class="section-title">Fuel / Auto</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" id="tot-fuel">$0</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="row" data-owner="Sheldon" data-val="442" data-cpp="0.5" data-pts="88400"><div class="row-info"><div class="row-name">Ford Pass Points</div><div class="row-sub">88,400 pts · 0.5¢</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$442</div></div></div>
+    <div class="row" data-owner="Janae" data-val="357" data-cpp="0.5" data-pts="71476"><div class="row-info"><div class="row-name">Ford Pass Points</div><div class="row-sub">71,476 pts · 0.5¢</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$357</div></div></div>
+    <div class="row" data-owner="Joint" data-val="347"><div class="row-info"><div class="row-name">Speedway Balance</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$347</div></div></div>
+    <div class="row" data-owner="Joint" data-val="10"><div class="row-info"><div class="row-name">Napa Rewards</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$10</div></div></div>
+    <div class="row" data-owner="Joint" data-val="8"><div class="row-info"><div class="row-name">Tractor Supply</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$8</div></div></div>
+  </div>
+</div>
+
+<!-- SHOPPING / PORTALS -->
+<div class="section" data-section="shop">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#22d3ee"></div>
+      <div class="section-title">Shopping / Portals</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" id="tot-shop">$0</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="row" data-owner="Joint" data-val="415"><div class="row-info"><div class="row-name">SwagBucks</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$415</div></div></div>
+    <div class="row" data-owner="Sheldon" data-val="250"><div class="row-info"><div class="row-name">Rakuten</div></div><div class="owner-badge badge-sheldon">Sheldon</div><div class="row-right"><div class="row-value">$250</div></div></div>
+    <div class="row" data-owner="Janae" data-val="51"><div class="row-info"><div class="row-name">Gear Up</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$51</div></div></div>
+    <div class="row" data-owner="Joint" data-val="10"><div class="row-info"><div class="row-name">Shop Back</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$10</div></div></div>
+    <div class="row" data-owner="Joint" data-val="7"><div class="row-info"><div class="row-name">Mr Rebates</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$7</div></div></div>
+    <div class="row" data-owner="Janae" data-val="5"><div class="row-info"><div class="row-name">MyPoints</div></div><div class="owner-badge badge-janae">Janae</div><div class="row-right"><div class="row-value">$5</div></div></div>
+    <div class="row" data-owner="Joint" data-val="6"><div class="row-info"><div class="row-name">Surveys</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$6</div></div></div>
+  </div>
+</div>
+
+<!-- BRAND / STORE -->
+<div class="section" data-section="brand">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#94a3b8"></div>
+      <div class="section-title">Brand / Store</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" id="tot-brand">$0</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="row" data-owner="Joint" data-val="50"><div class="row-info"><div class="row-name">Olight</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$50</div></div></div>
+    <div class="row" data-owner="Joint" data-val="35"><div class="row-info"><div class="row-name">Skechers</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$35</div></div></div>
+    <div class="row" data-owner="Joint" data-val="34"><div class="row-info"><div class="row-name">Credit Alo SIM</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$34</div></div></div>
+    <div class="row" data-owner="Joint" data-val="30"><div class="row-info"><div class="row-name">Gospel Publishers</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$30</div></div></div>
+    <div class="row" data-owner="Joint" data-val="16"><div class="row-info"><div class="row-name">Columbia</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$16</div></div></div>
+    <div class="row" data-owner="Joint" data-val="3"><div class="row-info"><div class="row-name">Bing</div></div><div class="owner-badge badge-joint">Joint</div><div class="row-right"><div class="row-value">$3</div></div></div>
+  </div>
+</div>
+```
+
+  </div><!-- /rewards-content -->
+</div><!-- /page-rewards -->
+
+<!-- ═══════════════════════════════════════════════ -->
+
+<!-- PAGE 2: CREDITS & BONUSES                       -->
+
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="page" id="page-credits">
+
+  <div class="alert-banner">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-text">
+      <strong>SoFi Deadline: May 16</strong>
+      Deposit $5K via 5 separate $1,000+ direct deposits within 25 days to earn $400 bonus.
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-pill active" onclick="filterCredits('all', this)">All</button>
+    <button class="filter-pill" onclick="filterCredits('Sheldon', this)">Sheldon</button>
+    <button class="filter-pill" onclick="filterCredits('Janae', this)">Janae</button>
+    <button class="filter-pill" onclick="filterCredits('Joint', this)">Joint</button>
+  </div>
+
+  <div class="search-wrap">
+    <input class="search-input" type="text" placeholder="Search credits…" oninput="searchRows(this.value, 'credits')">
+  </div>
+
+  <div class="content" id="credits-content">
+
+```
+<!-- CARD CREDITS -->
+<div class="section open" data-section="cardcredits">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#38bdf8"></div>
+      <div class="section-title">Card Credits 2025</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" style="color:#f59e0b">~$575+</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="credit-row" data-id="cr1" data-owner="Sheldon"><div class="credit-top"><div class="credit-name">Delta Stays – Amex Delta</div><div class="credit-value tbd" style="cursor:pointer;">TBD</div></div><div class="credit-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span class="credit-deadline normal">2025</span><span class="credit-notes">Check Amex portal</span></div></div>
+    <div class="credit-row" data-id="cr2" data-owner="Janae"><div class="credit-top"><div class="credit-name">Delta Stays – Amex Delta</div><div class="credit-value tbd" style="cursor:pointer;">TBD</div></div><div class="credit-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-deadline normal">2025</span><span class="credit-notes">Check Amex portal</span></div></div>
+    <div class="credit-row" data-id="cr3" data-owner="Joint"><div class="credit-top"><div class="credit-name">Capital One Venture X Travel Credit</div><div class="credit-value" style="cursor:pointer;">$300</div></div><div class="credit-meta"><span class="owner-badge badge-joint">Joint</span><span class="credit-deadline normal">Annual</span><span class="credit-notes">Auto-applied to travel</span></div></div>
+    <div class="credit-row" data-id="cr4" data-owner="Janae"><div class="credit-top"><div class="credit-name">Capital One Venture Travel Credit</div><div class="credit-value" style="cursor:pointer;">$14</div></div><div class="credit-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-deadline normal">2025</span></div></div>
+    <div class="credit-row" data-id="cr5" data-owner="Joint"><div class="credit-top"><div class="credit-name">Frontier Flight Credit</div><div class="credit-value" style="cursor:pointer;">$100</div></div><div class="credit-meta"><span class="owner-badge badge-joint">Joint</span><span class="credit-deadline">Use by Aug 2026</span></div></div>
+  </div>
+</div>
+
+<!-- AIRLINE CREDITS -->
+<div class="section open" data-section="aircredits">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#a78bfa"></div>
+      <div class="section-title">Airline Credits 2025</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" style="color:#f59e0b">~$275+</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="credit-row" data-id="cr6" data-owner="Janae"><div class="credit-top"><div class="credit-name">Aviator WiFi Credit</div><div class="credit-value" style="cursor:pointer;">$25</div></div><div class="credit-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-deadline normal">2025</span><span class="credit-notes">Inflight WiFi only</span></div></div>
+    <div class="credit-row" data-id="cr7" data-owner="Janae"><div class="credit-top"><div class="credit-name">Chase Preferred Hotel Credit</div><div class="credit-value" style="cursor:pointer;">$50</div></div><div class="credit-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-deadline normal">Annual</span><span class="credit-notes">Chase portal bookings only</span></div></div>
+    <div class="credit-row" data-id="cr8" data-owner="Sheldon"><div class="credit-top"><div class="credit-name">Chase Preferred Hotel Credit</div><div class="credit-value tbd" style="cursor:pointer;">TBD</div></div><div class="credit-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span class="credit-deadline normal">Annual</span><span class="credit-notes">Chase portal bookings only</span></div></div>
+    <div class="credit-row" data-id="cr9" data-owner="Joint"><div class="credit-top"><div class="credit-name">United Explorer Hotel Credits (×2)</div><div class="credit-value" style="cursor:pointer;">$100</div></div><div class="credit-meta"><span class="owner-badge badge-joint">Joint</span><span class="credit-deadline normal">Annual</span><span class="credit-notes">2 × $50</span></div></div>
+    <div class="credit-row" data-id="cr10" data-owner="Joint"><div class="credit-top"><div class="credit-name">United Business Hotel Credits (×2)</div><div class="credit-value" style="cursor:pointer;">$100</div></div><div class="credit-meta"><span class="owner-badge badge-joint">Joint</span><span class="credit-deadline normal">Annual</span><span class="credit-notes">2 × $50</span></div></div>
+    <div class="credit-row" data-id="cr11" data-owner="Joint"><div class="credit-top"><div class="credit-name">United Club Passes (4 total)</div><div class="credit-value tbd" style="cursor:pointer;">—</div></div><div class="credit-meta"><span class="owner-badge badge-joint">Joint</span><span class="credit-notes">2 per United card</span></div></div>
+  </div>
+</div>
+
+<!-- RESERVATIONS -->
+<div class="section open" data-section="reservations">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#f59e0b"></div>
+      <div class="section-title">Reservations / Misc</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" style="color:#f59e0b">$150</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="credit-row" data-id="cr12" data-owner="Sheldon"><div class="credit-top"><div class="credit-name">Ram Electric Pickup Reservation</div><div class="credit-value" style="cursor:pointer;">$100</div></div><div class="credit-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span class="credit-notes">Refundable deposit</span></div></div>
+    <div class="credit-row" data-id="cr13" data-owner="Sheldon"><div class="credit-top"><div class="credit-name">Slate Reservation</div><div class="credit-value" style="cursor:pointer;">$50</div></div><div class="credit-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span class="credit-notes">Reservation credit/deposit</span></div></div>
+  </div>
+</div>
+
+<!-- GROCERY POINTS -->
+<div class="section open" data-section="grocery">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#34d399"></div>
+      <div class="section-title">Grocery Points</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" style="color:#f59e0b">67,000 pts</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="credit-row" data-id="cr14" data-owner="Janae"><div class="credit-top"><div class="credit-name">Meijer Points</div><div class="credit-value" style="cursor:pointer;">52,000 pts</div></div><div class="credit-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-notes">Redeem at checkout</span></div></div>
+    <div class="credit-row" data-id="cr15" data-owner="Sheldon"><div class="credit-top"><div class="credit-name">Meijer Points</div><div class="credit-value" style="cursor:pointer;">15,000 pts</div></div><div class="credit-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span class="credit-notes">Redeem at checkout</span></div></div>
+  </div>
+</div>
+
+<!-- BANK BONUSES -->
+<div class="section open" data-section="bankbonus">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#22d3ee"></div>
+      <div class="section-title">Bank Bonuses</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" style="color:#f59e0b">~$580</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="credit-row" data-id="cr16" data-owner="Joint"><div class="credit-top"><div class="credit-name">Openbank by Verizon</div><div class="credit-value" style="cursor:pointer;">$180</div></div><div class="credit-meta"><span class="owner-badge badge-joint">Joint</span><span class="credit-deadline normal">12 months</span><span class="credit-notes">Avg $30K/mo balance required</span></div></div>
+    <div class="credit-row" data-id="cr17" data-owner="Sheldon"><div class="credit-top"><div class="credit-name">SoFi Sign-Up Bonus</div><div class="credit-value" style="cursor:pointer;">$400</div></div><div class="credit-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span class="credit-deadline">⚠️ By May 16</span><span class="credit-notes">5 × $1K+ direct deposits in 25 days</span></div></div>
+    <div class="credit-row" data-id="cr18" data-owner="Janae"><div class="credit-top"><div class="credit-name">Be Frugal</div><div class="credit-value tbd" style="cursor:pointer;">TBD</div></div><div class="credit-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-notes">Use after Sheldon's pays out</span></div></div>
+  </div>
+</div>
+
+<!-- CRYPTO -->
+<div class="section open" data-section="crypto">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-left">
+      <div class="section-dot" style="background:#94a3b8"></div>
+      <div class="section-title">Crypto (Kraken)</div>
+    </div>
+    <div class="section-right">
+      <div class="section-total" style="color:#f59e0b">$533</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="credit-row" data-id="cr19" data-owner="Sheldon"><div class="credit-top"><div class="credit-name">Kraken Balance</div><div class="credit-value" style="cursor:pointer;">$333</div></div><div class="credit-meta"><span class="owner-badge badge-sheldon">Sheldon</span></div></div>
+    <div class="credit-row" data-id="cr20" data-owner="Janae"><div class="credit-top"><div class="credit-name">Kraken Balance</div><div class="credit-value" style="cursor:pointer;">$200</div></div><div class="credit-meta"><span class="owner-badge badge-janae">Janae</span></div></div>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+
+<!-- PAGE 3: SUMMARY                                 -->
+
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="page" id="page-summary">
+  <div style="padding: 16px 12px 8px;">
+    <div style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:#64748b;text-transform:uppercase;margin-bottom:12px;">Portfolio Overview</div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="sum-card wide">
+      <div class="sum-label">Total Portfolio Value</div>
+      <div class="sum-value" style="font-size:32px;color:#f59e0b">$42,260</div>
+      <div class="sum-sub">Points, Miles & Cash</div>
+    </div>
+
+```
+<div class="sum-card">
+  <div class="sum-label">Sheldon</div>
+  <div class="sum-value" style="color:#38bdf8" id="sum-sheldon">—</div>
+  <div class="sum-sub">est. value</div>
+</div>
+<div class="sum-card">
+  <div class="sum-label">Janae</div>
+  <div class="sum-value" style="color:#a78bfa" id="sum-janae">—</div>
+  <div class="sum-sub">est. value</div>
+</div>
+<div class="sum-card wide">
+  <div class="sum-label">Joint / Shared</div>
+  <div class="sum-value" style="color:#34d399" id="sum-joint">—</div>
+  <div class="sum-sub">est. value</div>
+</div>
+
+<div class="sum-card">
+  <div class="sum-label">Top Asset</div>
+  <div class="sum-value" style="font-size:16px;line-height:1.3">Alaska<br>Miles</div>
+  <div class="sum-sub">$7,185</div>
+</div>
+<div class="sum-card">
+  <div class="sum-label">Best CPP</div>
+  <div class="sum-value" style="font-size:16px;line-height:1.3">Hyatt<br>Points</div>
+  <div class="sum-sub">1.8¢ per pt</div>
+</div>
+
+<div class="sum-card wide">
+  <div class="sum-label">Pending Credits & Bonuses</div>
+  <div class="sum-value" style="color:#f59e0b">~$1,700+</div>
+  <div class="sum-sub">Card credits, bank bonuses, reservations</div>
+</div>
+
+<div class="sum-card wide" style="border-color:rgba(251,113,133,.25);background:rgba(251,113,133,.07)">
+  <div class="sum-label" style="color:#fb7185">⚠️ Action Needed</div>
+  <div style="font-size:14px;color:#e2e8f0;line-height:1.6;margin-top:4px">
+    <strong>SoFi bonus expires May 16</strong> — $400 for 5 × $1K direct deposits<br>
+    <span style="color:#64748b">Use Janae's Be Frugal after Sheldon's pays out</span>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+
+<!-- PAGE 4: MONTHLY CREDITS                         -->
+
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="page" id="page-monthly">
+
+  <div class="month-bar">
+    <div class="month-label" id="currentMonthLabel">April 2025</div>
+    <button class="month-reset" onclick="resetMonthlyChecks()">Reset Month</button>
+  </div>
+  <div class="month-progress-wrap">
+    <div class="month-progress-bar"><div class="month-progress-fill" id="monthProgressFill" style="width:0%"></div></div>
+    <div class="month-progress-text" id="monthProgressText">0 of 0 claimed</div>
+  </div>
+
+  <div class="content">
+
+```
+<!-- FOOD DELIVERY -->
+<div class="mc-section open">
+  <div class="mc-section-header" onclick="this.closest('.mc-section').classList.toggle('open')">
+    <div class="mc-section-left">
+      <div class="mc-section-dot" style="background:#e97b3a"></div>
+      <div class="mc-section-title">Food Delivery</div>
+    </div>
+    <div class="mc-section-right">
+      <div class="mc-section-val">$112/mo</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="mc-section-body">
+    <div class="credit-item" data-id="mc1" data-owner="Joint" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Instacart Credit · Android ···8542</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-joint">Joint</span><span>Southwest</span></div>
+      </div>
+      <div class="credit-item-amount">$10</div>
+    </div>
+    <div class="credit-item" data-id="mc2" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Instacart Credit · iPhone ···9021</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span>United</span></div>
+      </div>
+      <div class="credit-item-amount">$10</div>
+    </div>
+    <div class="credit-item" data-id="mc3" data-owner="Sheldon" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Grubhub / Five Guys Credit · ···1006</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-sheldon">Sheldon</span></div>
+      </div>
+      <div class="credit-item-amount">$10</div>
+    </div>
+    <div class="credit-item" data-id="mc4" data-owner="Sheldon" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Instacart Credit · Android ···1114</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span>Ink</span></div>
+      </div>
+      <div class="credit-item-amount">$20</div>
+    </div>
+    <div class="credit-item" data-id="mc5" data-owner="Joint" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Instacart Credit · Android ···2444 (2nd order)</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-joint">Joint</span><span>Wells Fargo</span></div>
+      </div>
+      <div class="credit-item-amount">$20</div>
+    </div>
+    <div class="credit-item" data-id="mc6" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Instacart Credit · Ink ···8471</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span></div>
+      </div>
+      <div class="credit-item-amount">$20</div>
+    </div>
+    <div class="credit-item" data-id="mc7" data-owner="Joint" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Instacart Credit · iPhone ···7741</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-joint">Joint</span><span>United</span></div>
+      </div>
+      <div class="credit-item-amount">$10</div>
+    </div>
+    <div class="credit-item" data-id="mc8" data-owner="Sheldon" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">DoorDash Credit · iPhone ···4810</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span>Sapphire</span></div>
+      </div>
+      <div class="credit-item-amount">$10</div>
+    </div>
+    <div class="credit-item" data-id="mc9" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">DoorDash Credit · Android ···0529</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span>Sapphire</span></div>
+      </div>
+      <div class="credit-item-amount">$10</div>
+    </div>
+  </div>
+</div>
+
+<!-- UBER / RIDESHARE -->
+<div class="mc-section open">
+  <div class="mc-section-header" onclick="this.closest('.mc-section').classList.toggle('open')">
+    <div class="mc-section-left">
+      <div class="mc-section-dot" style="background:#7b1d2e"></div>
+      <div class="mc-section-title">Uber / Rideshare</div>
+    </div>
+    <div class="mc-section-right">
+      <div class="mc-section-val">$38/mo</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="mc-section-body">
+    <div class="credit-item" data-id="mc10" data-owner="Sheldon" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Uber Gold Card Credit</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-sheldon">Sheldon</span></div>
+      </div>
+      <div class="credit-item-amount">$10</div>
+    </div>
+    <div class="credit-item" data-id="mc11" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Uber Credit · Platinum</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span></div>
+      </div>
+      <div class="credit-item-amount">$15</div>
+    </div>
+    <div class="credit-item" data-id="mc12" data-owner="Joint" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Rideshare Credit · United Business</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-joint">Joint</span></div>
+      </div>
+      <div class="credit-item-amount">$8</div>
+    </div>
+    <div class="credit-item" data-id="mc13" data-owner="Joint" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Rideshare Credit · United Personal</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-joint">Joint</span></div>
+      </div>
+      <div class="credit-item-amount">$5</div>
+    </div>
+  </div>
+</div>
+
+<!-- DINING / LIFESTYLE -->
+<div class="mc-section open">
+  <div class="mc-section-header" onclick="this.closest('.mc-section').classList.toggle('open')">
+    <div class="mc-section-left">
+      <div class="mc-section-dot" style="background:#8a6a1f"></div>
+      <div class="mc-section-title">Dining / Lifestyle</div>
+    </div>
+    <div class="mc-section-right">
+      <div class="mc-section-val">$7/mo</div>
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="mc-section-body">
+    <div class="credit-item" data-id="mc14" data-owner="Sheldon" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Dunkin' Gold Credit</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-sheldon">Sheldon</span></div>
+      </div>
+      <div class="credit-item-amount">$7</div>
+    </div>
+  </div>
+</div>
+
+<!-- SEASONAL / QUARTERLY (Platinum Janae) -->
+<div class="mc-section open">
+  <div class="mc-section-header" onclick="this.closest('.mc-section').classList.toggle('open')">
+    <div class="mc-section-left">
+      <div class="mc-section-dot" style="background:#2d6e4a"></div>
+      <div class="mc-section-title">Seasonal Credits · Janae Platinum</div>
+    </div>
+    <div class="mc-section-right">
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="mc-section-body">
+    <div class="credit-item" data-id="mc15" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">FHR Statement Credit · Platinum #1</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Jan–Jun</span></div>
+      </div>
+      <div class="credit-item-amount">$300</div>
+    </div>
+    <div class="credit-item" data-id="mc16" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">FHR Statement Credit · Platinum #2</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Jul–Dec</span></div>
+      </div>
+      <div class="credit-item-amount">$300</div>
+    </div>
+    <div class="credit-item" data-id="mc17" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Resy Credit · Platinum #1</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Jan–Mar</span></div>
+      </div>
+      <div class="credit-item-amount">$100</div>
+    </div>
+    <div class="credit-item" data-id="mc18" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Resy Credit · Platinum #2</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Apr–Jun</span></div>
+      </div>
+      <div class="credit-item-amount">$100</div>
+    </div>
+    <div class="credit-item" data-id="mc19" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Resy Credit · Platinum #3</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Jul–Sep</span></div>
+      </div>
+      <div class="credit-item-amount">$100</div>
+    </div>
+    <div class="credit-item" data-id="mc20" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Resy Credit · Platinum #4</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Oct–Dec</span></div>
+      </div>
+      <div class="credit-item-amount">$100</div>
+    </div>
+    <div class="credit-item" data-id="mc21" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Lululemon Credit · Platinum #1</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Jan–Mar</span></div>
+      </div>
+      <div class="credit-item-amount">$75</div>
+    </div>
+    <div class="credit-item" data-id="mc22" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Lululemon Credit · Platinum #2</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Apr–Jun</span></div>
+      </div>
+      <div class="credit-item-amount">$75</div>
+    </div>
+    <div class="credit-item" data-id="mc23" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Lululemon Credit · Platinum #3</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Jul–Sep</span></div>
+      </div>
+      <div class="credit-item-amount">$75</div>
+    </div>
+    <div class="credit-item" data-id="mc24" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Lululemon Credit · Platinum #4</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Oct–Dec</span></div>
+      </div>
+      <div class="credit-item-amount">$75</div>
+    </div>
+    <div class="credit-item" data-id="mc25" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Saks Fifth Credit · Platinum #1</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Jan–Jun</span></div>
+      </div>
+      <div class="credit-item-amount">$50</div>
+    </div>
+    <div class="credit-item" data-id="mc26" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Saks Fifth Credit · Platinum #2</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Jul–Dec</span></div>
+      </div>
+      <div class="credit-item-amount">$50</div>
+    </div>
+    <div class="credit-item" data-id="mc27" data-owner="Janae" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Airline Fee Credit · Platinum (annual)</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-janae">Janae</span><span class="credit-period-badge">Annual</span></div>
+      </div>
+      <div class="credit-item-amount">$200</div>
+    </div>
+  </div>
+</div>
+
+<!-- SEASONAL / SHELDON -->
+<div class="mc-section open">
+  <div class="mc-section-header" onclick="this.closest('.mc-section').classList.toggle('open')">
+    <div class="mc-section-left">
+      <div class="mc-section-dot" style="background:#38bdf8;filter:brightness(.7)"></div>
+      <div class="mc-section-title">Seasonal Credits · Sheldon</div>
+    </div>
+    <div class="mc-section-right">
+      <div class="chevron">▼</div>
+    </div>
+  </div>
+  <div class="mc-section-body">
+    <div class="credit-item" data-id="mc28" data-owner="Sheldon" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Resy Credit</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span class="credit-period-badge">Jan–Jun</span></div>
+      </div>
+      <div class="credit-item-amount">$50</div>
+    </div>
+    <div class="credit-item" data-id="mc29" data-owner="Sheldon" onclick="toggleCredit(this)">
+      <div class="credit-checkbox"><span class="credit-checkbox-tick">✓</span></div>
+      <div class="credit-item-info">
+        <div class="credit-item-name">Resy Credit</div>
+        <div class="credit-item-meta"><span class="owner-badge badge-sheldon">Sheldon</span><span class="credit-period-badge">Jul–Dec</span></div>
+      </div>
+      <div class="credit-item-amount">$50</div>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<button class="edit-mode-btn" id="editModeBtn" onclick="toggleEditMode()">✏️ Edit Values</button>
+
+<div class="edit-hint">Tap any account to edit</div>
+
+<!-- ── EDIT MODAL ── -->
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Account Name</div>
+    <div class="modal-owner" id="modalOwner">Owner</div>
+    <div class="modal-label" id="modalLabel">Points / Miles</div>
+    <input class="modal-input" id="modalInput" type="number" inputmode="numeric" placeholder="0">
+    <div class="modal-hint" id="modalHint">Enter your current points balance</div>
+    <div id="modalCalcPreview" style="font-size:13px;color:#38bdf8;font-weight:600;margin-bottom:16px;min-height:20px;"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" id="modalCancelBtn">Cancel</button>
+      <button class="modal-save" id="modalSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SCROLL HIDE/SHOW HEADER ──
+let lastScroll = 0;
+const header = document.querySelector('.header');
+window.addEventListener('scroll', () => {
+  const current = window.scrollY;
+  if (current > lastScroll && current > 60) {
+    header.classList.add('hidden');
+  } else {
+    header.classList.remove('hidden');
+  }
+  lastScroll = current;
+}, { passive: true });
+
+// ── SECTION TOGGLE ──
+function toggleSection(header) {
+  header.closest('.section').classList.toggle('open');
+}
+
+// ── TAB SWITCH ──
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+}
+
+// ── OWNER FILTER (rewards) ──
+let activeFilter = 'all';
+function filterRows(owner, btn) {
+  activeFilter = owner;
+  document.querySelectorAll('.filter-bar .filter-pill').forEach(p => {
+    p.classList.remove('active');
+    p.style.backgroundColor = '#0f1e35';
+    p.style.borderColor = '#3d5a80';
+    p.style.color = '#e2e8f0';
+    p.style.fontWeight = '500';
+  });
+  btn.classList.add('active');
+  btn.style.backgroundColor = '#38bdf8';
+  btn.style.borderColor = '#38bdf8';
+  btn.style.color = '#000000';
+  btn.style.fontWeight = '700';
+  applyRewardsFilter();
+}
+
+function applyRewardsFilter() {
+  document.querySelectorAll('#rewards-content .row').forEach(row => {
+    const o = row.dataset.owner;
+    const match = activeFilter === 'all' || o === activeFilter || (activeFilter !== 'all' && o === 'Joint');
+    row.classList.toggle('hidden', !match);
+  });
+  updateSectionTotals();
+}
+
+// ── OWNER FILTER (credits) ──
+let activeCreditsFilter = 'all';
+function filterCredits(owner, btn) {
+  activeCreditsFilter = owner;
+  btn.closest('.filter-bar').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#credits-content .credit-row').forEach(row => {
+    const o = row.dataset.owner;
+    const match = owner === 'all' || o === owner || (owner !== 'all' && o === 'Joint');
+    row.classList.toggle('hidden', !match);
+  });
+}
+
+// ── SEARCH ──
+function searchRows(query, page) {
+  const q = query.toLowerCase().trim();
+  if (page === 'rewards') {
+    document.querySelectorAll('#rewards-content .row').forEach(row => {
+      const name = row.querySelector('.row-name')?.textContent.toLowerCase() || '';
+      row.classList.toggle('hidden', q !== '' && !name.includes(q));
+    });
+  } else {
+    document.querySelectorAll('#credits-content .credit-row').forEach(row => {
+      const name = row.querySelector('.credit-name')?.textContent.toLowerCase() || '';
+      row.classList.toggle('hidden', q !== '' && !name.includes(q));
+    });
+  }
+  updateSectionTotals();
+}
+
+// ── SECTION TOTALS ──
+function updateSectionTotals() {
+  const sections = {
+    airline:  'tot-airline',
+    transfer: 'tot-transfer',
+    hotel:    'tot-hotel',
+    cash:     'tot-cash',
+    fuel:     'tot-fuel',
+    shop:     'tot-shop',
+    brand:    'tot-brand',
+  };
+  let grandTotal = 0;
+  for (const [sec, totId] of Object.entries(sections)) {
+    const section = document.querySelector(`[data-section="${sec}"]`);
+    if (!section) continue;
+    let sum = 0;
+    section.querySelectorAll('.row').forEach(r => {
+      if (!r.classList.contains('hidden')) {
+        sum += parseFloat(r.dataset.val) || 0;
+      }
+    });
+    grandTotal += sum;
+    const el = document.getElementById(totId);
+    if (el) el.textContent = '$' + sum.toLocaleString();
+  }
+  document.getElementById('grandTotal').textContent = '$' + grandTotal.toLocaleString();
+  calcSummary();
+}
+
+// ── SUMMARY OWNER TOTALS ──
+function calcSummary() {
+  let s = 0, j = 0, joint = 0;
+  document.querySelectorAll('#rewards-content .row').forEach(row => {
+    const val = parseFloat(row.dataset.val) || 0;
+    const o = row.dataset.owner;
+    if (o === 'Sheldon') s += val;
+    else if (o === 'Janae') j += val;
+    else joint += val;
+  });
+  document.getElementById('sum-sheldon').textContent = '$' + s.toLocaleString();
+  document.getElementById('sum-janae').textContent   = '$' + j.toLocaleString();
+  document.getElementById('sum-joint').textContent   = '$' + joint.toLocaleString();
+}
+
+// ── EDIT MODE ──
+let editMode = false;
+
+function toggleEditMode() {
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('editModeBtn');
+  if (editMode) {
+    btn.textContent = '✓ Done Editing';
+    btn.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.add('open'));
+  } else {
+    btn.textContent = '✏️ Edit Values';
+    btn.classList.remove('active');
+    closeModal();
+  }
+}
+
+function initEditableRows() {
+  document.querySelectorAll('#rewards-content .row').forEach(row => {
+    const wrap = document.createElement('div');
+    wrap.className = 'row-wrap';
+    row.parentNode.insertBefore(wrap, row);
+    wrap.appendChild(row);
+
+    row.addEventListener('click', () => {
+      if (!editMode) return;
+      openModal(row);
+    });
+  });
+}
+
+function openModal(row) {
+  editingRow = row;
+  const name  = row.querySelector('.row-name')?.textContent || '';
+  const owner = row.dataset.owner || '';
+  const cpp   = parseFloat(row.dataset.cpp) || 0;
+  const pts   = parseFloat(row.dataset.pts) || 0;
+
+  document.getElementById('modalTitle').textContent = name;
+  document.getElementById('modalOwner').textContent = owner;
+
+  if (cpp > 0) {
+    // Points-based account
+    document.getElementById('modalLabel').textContent = 'Points / Miles Balance';
+    document.getElementById('modalHint').textContent = 'Enter your current points balance';
+    document.getElementById('modalInput').placeholder = '0';
+    document.getElementById('modalInput').value = pts > 0 ? pts : '';
+    updateCalcPreview();
+  } else {
+    // Cash-based account — enter dollar value directly
+    document.getElementById('modalLabel').textContent = 'Cash Value ($)';
+    document.getElementById('modalHint').textContent = 'Enter the current dollar value';
+    document.getElementById('modalInput').placeholder = '0';
+    document.getElementById('modalInput').value = parseFloat(row.dataset.val) || '';
+    document.getElementById('modalCalcPreview').textContent = '';
+  }
+
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('modalInput').focus(), 300);
+}
+
+function updateCalcPreview() {
+  if (!editingRow) return;
+  const cpp = parseFloat(editingRow.dataset.cpp) || 0;
+  if (!cpp) return;
+  const pts = parseFloat(document.getElementById('modalInput').value) || 0;
+  const val = Math.round(pts * cpp) / 100;
+  document.getElementById('modalCalcPreview').textContent =
+    pts > 0 ? '≈ $' + val.toLocaleString() + ' estimated value' : '';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingRow = null;
+  editingCreditRow = null;
+  document.getElementById('modalCalcPreview').textContent = '';
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+let isSaving = false;
+function saveEdit() {
+  if (isSaving) return;
+  isSaving = true;
+  setTimeout(() => { isSaving = false; }, 500);
+
+  const raw = parseFloat(document.getElementById('modalInput').value);
+  if (isNaN(raw) || raw < 0) { alert('Please enter a valid amount.'); return; }
+
+  if (editingCreditRow) {
+    const valEl = editingCreditRow.querySelector('.credit-value');
+    if (valEl) {
+      valEl.textContent = '$' + raw.toLocaleString();
+      valEl.classList.remove('tbd');
+    }
+    const id = editingCreditRow.dataset.id;
+    if (id) {
+      const credits = JSON.parse(localStorage.getItem('rewardsHQ_credits') || '{}');
+      credits[id] = raw;
+      localStorage.setItem('rewardsHQ_credits', JSON.stringify(credits));
+    }
+    editingCreditRow = null;
+    editingRow = null;
+    document.getElementById('modalOverlay').classList.remove('open');
+    return;
+  }
+
+  if (editingRow) {
+    const cpp = parseFloat(editingRow.dataset.cpp) || 0;
+    let dollarVal;
+    if (cpp > 0) {
+      dollarVal = Math.round(raw * cpp) / 100;
+      editingRow.dataset.pts = raw;
+      const subEl = editingRow.querySelector('.row-sub');
+      if (subEl) subEl.textContent = Number(raw).toLocaleString() + ' pts · ' + cpp + '¢';
+    } else {
+      dollarVal = raw;
+    }
+    editingRow.dataset.val = dollarVal;
+    const valEl = editingRow.querySelector('.row-value');
+    if (valEl) {
+      valEl.textContent = '$' + dollarVal.toLocaleString();
+      valEl.classList.remove('tbd');
+    }
+    editingRow = null;
+    editingCreditRow = null;
+    document.getElementById('modalOverlay').classList.remove('open');
+    updateSectionTotals();
+    saveToCloud();
+    return;
+  }
+
+  // Force close modal anyway
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// ── MODAL BUTTON WIRING ──
+// Use touchend + preventDefault to stop iOS from firing both touch and click
+const saveBtn = document.getElementById('modalSaveBtn');
+const cancelBtn = document.getElementById('modalCancelBtn');
+
+function handleSave(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  saveEdit();
+}
+function handleCancel(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  closeModal();
+}
+
+saveBtn.addEventListener('touchend', handleSave, { passive: false });
+saveBtn.addEventListener('click', handleSave);
+cancelBtn.addEventListener('touchend', handleCancel, { passive: false });
+cancelBtn.addEventListener('click', handleCancel);
+
+// Allow Enter key to save
+document.getElementById('modalInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveEdit();
+  if (e.key === 'Escape') closeModal();
+});
+document.getElementById('modalInput').addEventListener('input', updateCalcPreview);
+
+function resetValues() {
+  if (!confirm('Reset all values back to the originals? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+// ── GOOGLE APPS SCRIPT CLOUD SYNC ──
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKcGrwMUiQzOB9-gvqVk2GIVUCx-gwVdFXtsbb0eKmO5ry93F4x-1SqqN6PtiVZwarBw/exec';
+const STORAGE_KEY = 'rewardsHQ_values';
+
+function getRowKey(row, i) {
+  const name  = row.querySelector('.row-name')?.textContent || '';
+  const owner = row.dataset.owner || '';
+  return i + '_' + name + '_' + owner;
+}
+
+function collectData() {
+  const data = {};
+  document.querySelectorAll('#rewards-content .row').forEach((row, i) => {
+    data[getRowKey(row, i)] = parseFloat(row.dataset.val) || 0;
+  });
+  return data;
+}
+
+function applyData(data) {
+  document.querySelectorAll('#rewards-content .row').forEach((row, i) => {
+    const key = getRowKey(row, i);
+    if (data[key] !== undefined) {
+      const val = data[key];
+      row.dataset.val = val;
+      const valEl = row.querySelector('.row-value');
+      if (valEl) {
+        valEl.textContent = '$' + Number(val).toLocaleString();
+        valEl.classList.remove('tbd');
+      }
+    }
+  });
+}
+
+function showSyncStatus(msg, color) {
+  let el = document.getElementById('syncStatus');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'syncStatus';
+    el.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:999;padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;font-family:DM Sans,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.15);transition:opacity .4s;white-space:nowrap;pointer-events:none;';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.background = color === 'green' ? '#2d6e4a' : color === 'red' ? '#7b1d2e' : '#555';
+  el.style.color = '#fff';
+  el.style.opacity = '1';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.style.opacity = '0'; }, 2500);
+}
+
+async function saveToCloud() {
+  const data = collectData();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  showSyncStatus('Saving…', 'gray');
+  try {
+    const url = SCRIPT_URL + '?action=save&values=' + encodeURIComponent(JSON.stringify(data));
+    const res = await fetch(url, { method: 'GET' });
+    const json = await res.json();
+    if (json.ok) {
+      showSyncStatus('✓ Saved to cloud', 'green');
+    } else {
+      showSyncStatus('⚠ Saved locally only', 'red');
+    }
+  } catch(e) {
+    console.warn('Save error:', e);
+    showSyncStatus('⚠ Saved locally only', 'red');
+  }
+}
+
+async function loadFromCloud() {
+  const local = localStorage.getItem(STORAGE_KEY);
+  if (local) { try { applyData(JSON.parse(local)); } catch(e) {} }
+  showSyncStatus('Syncing…', 'gray');
+  try {
+    const res = await fetch(SCRIPT_URL + '?action=load', { method: 'GET' });
+    const json = await res.json();
+    if (json.ok && json.data && Object.keys(json.data).length > 0) {
+      applyData(json.data);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(json.data));
+      showSyncStatus('✓ Synced', 'green');
+    } else {
+      showSyncStatus('Cloud empty — using local', 'gray');
+    }
+  } catch(e) {
+    console.warn('Load error:', e);
+    showSyncStatus('Using local data', 'gray');
+  }
+  updateSectionTotals();
+  calcSummary();
+}
+
+function resetValues() {
+  if (!confirm('Reset all values back to the originals? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+// ── CREDIT ROW LONG PRESS EDITING ──
+function initEditableCreditRows() {
+  document.querySelectorAll('.credit-row').forEach(row => {
+    row.addEventListener('click', () => {
+      if (!editMode) return;
+      openCreditModal(row);
+    });
+  });
+}
+
+function openCreditModal(row) {
+  editingCreditRow = row;
+  const name = row.querySelector('.credit-name')?.textContent || '';
+  const valEl = row.querySelector('.credit-value');
+  const current = valEl?.textContent?.replace(/[^0-9.]/g, '') || '';
+
+  document.getElementById('modalTitle').textContent = name;
+  document.getElementById('modalOwner').textContent = 'Long press to edit credit value';
+  document.getElementById('modalLabel').textContent = 'Credit Value ($)';
+  document.getElementById('modalHint').textContent = 'Enter the dollar amount for this credit';
+  document.getElementById('modalInput').value = current;
+  document.getElementById('modalCalcPreview').textContent = '';
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('modalInput').focus(), 300);
+}
+
+function saveCreditEdit() {
+  if (!editingCreditRow) return savePtsCreditEdit();
+  const raw = parseFloat(document.getElementById('modalInput').value);
+  if (isNaN(raw) || raw < 0) { alert('Please enter a valid amount.'); return; }
+  const valEl = editingCreditRow.querySelector('.credit-value');
+  if (valEl) {
+    valEl.textContent = '$' + raw.toLocaleString();
+    valEl.classList.remove('tbd');
+  }
+  // Save credit edits to localStorage
+  const id = editingCreditRow.dataset.id;
+  if (id) {
+    const credits = JSON.parse(localStorage.getItem('rewardsHQ_credits') || '{}');
+    credits[id] = raw;
+    localStorage.setItem('rewardsHQ_credits', JSON.stringify(credits));
+  }
+  editingCreditRow = null;
+  closeModal();
+}
+
+function loadCreditEdits() {
+  const credits = JSON.parse(localStorage.getItem('rewardsHQ_credits') || '{}');
+  for (const [id, val] of Object.entries(credits)) {
+    const row = document.querySelector(`.credit-row[data-id="${id}"]`);
+    if (row) {
+      const valEl = row.querySelector('.credit-value');
+      if (valEl) {
+        valEl.textContent = '$' + Number(val).toLocaleString();
+        valEl.classList.remove('tbd');
+      }
+    }
+  }
+}
+
+// ── MONTHLY CREDITS CLOUD SYNC ──
+async function saveMonthlyToCloud() {
+  const key = getMCStorageKey();
+  const checked = [];
+  document.querySelectorAll('.credit-item.checked').forEach(item => checked.push(item.dataset.id));
+  localStorage.setItem(key, JSON.stringify(checked));
+
+  try {
+    const payload = { monthly_key: key, checked };
+    const url = SCRIPT_URL + '?action=save_monthly&values=' + encodeURIComponent(JSON.stringify(payload));
+    await fetch(url, { method: 'GET' });
+  } catch(e) { console.warn('Monthly save error:', e); }
+}
+
+async function loadMonthlyFromCloud() {
+  const key = getMCStorageKey();
+  try {
+    const res = await fetch(SCRIPT_URL + '?action=load_monthly&monthly_key=' + encodeURIComponent(key));
+    const json = await res.json();
+    if (json.ok && json.checked) {
+      localStorage.setItem(key, JSON.stringify(json.checked));
+      return json.checked;
+    }
+  } catch(e) { console.warn('Monthly load error:', e); }
+  // Fall back to local
+  const local = localStorage.getItem(key);
+  return local ? JSON.parse(local) : [];
+}
+
+// ── MONTHLY CREDITS ──
+const MC_KEY = 'rewardsHQ_monthly';
+
+function getMCStorageKey() {
+  const now = new Date();
+  return `${MC_KEY}_${now.getFullYear()}_${now.getMonth()}`;
+}
+
+async function loadMonthlyChecks() {
+  const checked = await loadMonthlyFromCloud();
+  document.querySelectorAll('.credit-item').forEach(item => {
+    item.classList.toggle('checked', checked.includes(item.dataset.id));
+  });
+  updateMonthProgress();
+  const now = new Date();
+  document.getElementById('currentMonthLabel').textContent =
+    now.toLocaleString('default', { month: 'long', year: 'numeric' });
+}
+
+function saveMonthlyChecks() {
+  saveMonthlyToCloud();
+  updateMonthProgress();
+}
+
+function toggleCredit(el) {
+  el.classList.toggle('checked');
+  saveMonthlyChecks();
+  updateMonthProgress();
+}
+
+function updateMonthProgress() {
+  const all = document.querySelectorAll('.credit-item').length;
+  const done = document.querySelectorAll('.credit-item.checked').length;
+  const pct = all > 0 ? Math.round((done / all) * 100) : 0;
+  document.getElementById('monthProgressFill').style.width = pct + '%';
+  document.getElementById('monthProgressText').textContent = `${done} of ${all} claimed`;
+}
+
+function resetMonthlyChecks() {
+  if (!confirm('Uncheck all credits for this month?')) return;
+  document.querySelectorAll('.credit-item').forEach(i => i.classList.remove('checked'));
+  saveMonthlyChecks();
+  updateMonthProgress();
+}
+
+// ── INIT ──
+initEditableRows();
+initEditableCreditRows();
+loadFromCloud();
+loadMonthlyChecks();
+loadCreditEdits();
+updateSectionTotals();
+calcSummary();
+</script>
+
+</body>
+</html>
